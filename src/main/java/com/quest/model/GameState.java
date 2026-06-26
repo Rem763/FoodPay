@@ -137,6 +137,8 @@ public class GameState {
         this.hp = Math.max(0, Math.min(hp, maxHp));
         if (this.hp == 0) {
             defeated = true;
+        } else {
+            defeated = false;
         }
     }
 

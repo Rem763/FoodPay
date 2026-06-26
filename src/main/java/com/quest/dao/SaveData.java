@@ -68,9 +68,13 @@ public class SaveData {
         state.setLevel(level);
         state.setStars(stars);
         state.setRound(round);
-        state.setDifficulty(GameState.Difficulty.valueOf(difficulty == null ? "NORMAL" : difficulty));
+        try {
+            state.setDifficulty(GameState.Difficulty.valueOf(difficulty == null ? "NORMAL" : difficulty));
+        } catch (IllegalArgumentException e) {
+            state.setDifficulty(GameState.Difficulty.NORMAL);
+        }
         state.setCurrentQuestion(currentQuestion);
-        state.setOptions(options);
+        state.setOptions(options != null ? options : new String[]{"?", "?", "?", "?"});
         state.setCountdown(countdown);
         state.setCorrectAnswerIndex(correctAnswerIndex);
         state.setBattleFinished(battleFinished);

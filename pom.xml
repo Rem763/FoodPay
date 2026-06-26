@@ -13,8 +13,6 @@
         <maven.compiler.release>17</maven.compiler.release>
         <javafx.version>21.0.5</javafx.version>
         <jackson.version>2.17.2</jackson.version>
-        <hikari.version>5.1.0</hikari.version>
-        <mysql.version>9.2.0</mysql.version>
     </properties>
 
     <dependencies>
@@ -37,16 +35,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikari.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql.version}</version>
         </dependency>
     </dependencies>
 

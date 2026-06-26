@@ -42,10 +42,10 @@
                 <Label fx:id="roundLabel" text="回合" style="-fx-font-size: 18px; -fx-text-fill: #ffffff;" />
                 <Label fx:id="coinLabel" text="金币" style="-fx-text-fill: #ffffff;" />
                 <Label fx:id="questionLabel" text="题目" style="-fx-font-size: 26px; -fx-text-fill: #fff2b2; -fx-background-color: rgba(0,0,0,0.30); -fx-border-color: #f7d66b; -fx-border-width: 2; -fx-padding: 8 12 8 12;" />
-                <StackPane prefWidth="540" prefHeight="22">
+                <StackPane prefWidth="900" prefHeight="22" maxWidth="900">
                     <children>
-                        <Rectangle fx:id="countdownBar" width="540" height="22" arcWidth="0" arcHeight="0" fill="#e6e6e6" />
-                        <Region fx:id="countdownFill" prefHeight="22" prefWidth="540" style="-fx-background-insets: 0;" />
+                        <Rectangle fx:id="countdownBar" width="900" height="22" arcWidth="12" arcHeight="12" fill="#1a1a2e" stroke="#f7d66b" strokeWidth="2" />
+                        <Region fx:id="countdownFill" prefHeight="22" prefWidth="900" style="-fx-background-insets: 0;" />
                     </children>
                 </StackPane>
                 <Label fx:id="countdownLabel" text="倒计时" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;" />

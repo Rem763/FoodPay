@@ -28,8 +28,13 @@ public class BattleController extends BaseSceneController {
     private Timeline idleFloatTimeline;
     private Timeline playerAttackTimeline;
     private Timeline playerHurtTimeline;
+    private Timeline playerDeadTimeline;
     private Timeline monsterAttackTimeline;
     private Timeline monsterHurtTimeline;
+    private PauseTransition battleEndDelay;
+    private PauseTransition playerAttackDelay;
+    private PauseTransition monsterAttackDelay;
+    private Rectangle countdownClip;
 
     @FXML private StackPane battleRoot;
     @FXML private ImageView backgroundImage;
@@ -70,10 +75,22 @@ public class BattleController extends BaseSceneController {
         }
         setPlayerState("idle");
         setMonsterState("idle");
+        if (countdownFill != null) {
+            countdownFill.setStyle("-fx-background-color: linear-gradient(to right, #4caf50, #9be15d); -fx-background-radius: 12; -fx-background-insets: 0;");
+            countdownClip = new Rectangle(900, 22);
+            countdownClip.setArcWidth(12);
+            countdownClip.setArcHeight(12);
+            countdownFill.setClip(countdownClip);
+        }
     }
 
     private Image loadImage(String path) {
-        return new Image(getClass().getResourceAsStream(path));
+        java.io.InputStream stream = getClass().getResourceAsStream(path);
+        if (stream == null) {
+            System.err.println("Missing resource: " + path);
+            return null;
+        }
+        return new Image(stream);
     }
 
 
@@ -210,6 +227,10 @@ public class BattleController extends BaseSceneController {
             playerHurtTimeline.stop();
             playerHurtTimeline = null;
         }
+        if (playerDeadTimeline != null) {
+            playerDeadTimeline.stop();
+            playerDeadTimeline = null;
+        }
         if (monsterAttackTimeline != null) {
             monsterAttackTimeline.stop();
             monsterAttackTimeline = null;
@@ -217,6 +238,21 @@ public class BattleController extends BaseSceneController {
         if (monsterHurtTimeline != null) {
             monsterHurtTimeline.stop();
             monsterHurtTimeline = null;
+        }
+        if (playerAttackDelay != null) {
+            playerAttackDelay.stop();
+            playerAttackDelay = null;
+        }
+        if (monsterAttackDelay != null) {
+            monsterAttackDelay.stop();
+            monsterAttackDelay = null;
+        }
+    }
+
+    private void cancelBattleEndDelay() {
+        if (battleEndDelay != null) {
+            battleEndDelay.stop();
+            battleEndDelay = null;
         }
     }
 
@@ -238,6 +274,8 @@ public class BattleController extends BaseSceneController {
                 playerAttackTimeline = timeline;
             } else if (folder.contains("player/hurt")) {
                 playerHurtTimeline = timeline;
+            } else if (folder.contains("player/dead")) {
+                playerDeadTimeline = timeline;
             }
         } else if (sprite == monsterSprite) {
             if (folder.contains("slime/attack")) {
@@ -266,24 +304,28 @@ public class BattleController extends BaseSceneController {
             countdownLabel.setStyle(state.getCountdown() <= 3 ? "-fx-font-size: 20px; -fx-font-weight: bold;" : "-fx-font-size: 20px;");
         }
         if (feedbackLabel != null) feedbackLabel.setText(state.getFeedback());
-        if (option1Button != null) option1Button.setText(state.getOptions()[0]);
-        if (option2Button != null) option2Button.setText(state.getOptions()[1]);
-        if (option3Button != null) option3Button.setText(state.getOptions()[2]);
-        if (option4Button != null) option4Button.setText(state.getOptions()[3]);
+        String[] opts = state.getOptions();
+        if (opts != null) {
+            if (option1Button != null) option1Button.setText(opts[0]);
+            if (option2Button != null) option2Button.setText(opts[1]);
+            if (option3Button != null) option3Button.setText(opts[2]);
+            if (option4Button != null) option4Button.setText(opts[3]);
+        }
         updateCountdownBar(state);
     }
 
     private void updateCountdownBar(GameState state) {
-        if (countdownFill == null || countdownBar == null) {
+        if (countdownClip == null) {
             return;
         }
         double maxSeconds = state.getBattleCountdownSeconds();
-        double ratio = Math.max(0.0, Math.min(1.0, state.getCountdown() / maxSeconds));
-        double width = countdownBar.getWidth() > 0 ? countdownBar.getWidth() : 520;
-        countdownFill.setPrefWidth(width * ratio);
-        countdownFill.setStyle(ratio <= 0.3
-                ? "-fx-background-color: linear-gradient(to right, #ff4d4d, #ff9966); -fx-background-radius: 12;"
-                : "-fx-background-color: linear-gradient(to right, #4caf50, #9be15d); -fx-background-radius: 12;");
+        double ratio = Math.max(0.0, Math.min(1.0, (double) state.getCountdown() / maxSeconds));
+        countdownClip.setWidth(900 * ratio);
+        if (ratio <= 0.3) {
+            countdownFill.setStyle("-fx-background-color: linear-gradient(to right, #ff4d4d, #ff9966); -fx-background-radius: 12; -fx-background-insets: 0;");
+        } else {
+            countdownFill.setStyle("-fx-background-color: linear-gradient(to right, #4caf50, #9be15d); -fx-background-radius: 12; -fx-background-insets: 0;");
+        }
     }
 
     @FXML public void chooseOption1() { answerSelected(0); }
@@ -335,9 +377,9 @@ public class BattleController extends BaseSceneController {
             state.setFeedback(timeout ? "时间到！挑战失败" : "闯关失败");
             playTimeoutFailAnimation();
             sceneManager.resetAfterDefeat();
-            PauseTransition delay = new PauseTransition(Duration.millis(1400));
-            delay.setOnFinished(e -> finishBattle());
-            delay.play();
+            battleEndDelay = new PauseTransition(Duration.millis(1400));
+            battleEndDelay.setOnFinished(e -> finishBattle());
+            battleEndDelay.play();
             return;
         }
 
@@ -349,9 +391,9 @@ public class BattleController extends BaseSceneController {
             state.setBattleResult(true, state.getLevel(), rewardCoins, rewardStars);
             state.addBattleRecord(new BattleRecord(state.getLevel(), true, rewardCoins, rewardStars, state.getRound(), System.currentTimeMillis()));
             playVictoryAnimation();
-            PauseTransition delay = new PauseTransition(Duration.millis(900));
-            delay.setOnFinished(e -> finishBattle());
-            delay.play();
+            battleEndDelay = new PauseTransition(Duration.millis(900));
+            battleEndDelay.setOnFinished(e -> finishBattle());
+            battleEndDelay.play();
             return;
         }
 
@@ -377,14 +419,14 @@ public class BattleController extends BaseSceneController {
         if (playerSprite != null) {
             setPlayerState("idle");
             playFrameAnimation(playerSprite, "player/attack", 4, 0.08, () -> setPlayerState("idle"));
-            PauseTransition delay = new PauseTransition(Duration.millis(220));
-            delay.setOnFinished(e -> {
+            playerAttackDelay = new PauseTransition(Duration.millis(220));
+            playerAttackDelay.setOnFinished(e -> {
                 if (monsterSprite != null) {
                     setMonsterState("hurt");
                     playFrameAnimation(monsterSprite, "slime/hurt", 2, 0.08, () -> setMonsterState("idle"));
                 }
             });
-            delay.play();
+            playerAttackDelay.play();
         }
     }
 
@@ -404,14 +446,14 @@ public class BattleController extends BaseSceneController {
         }
         if (monsterSprite != null) {
             playFrameAnimation(monsterSprite, "slime/attack", 8, 0.06, () -> setMonsterState("idle"));
-            PauseTransition delay = new PauseTransition(Duration.millis(220));
-            delay.setOnFinished(e -> {
+            monsterAttackDelay = new PauseTransition(Duration.millis(220));
+            monsterAttackDelay.setOnFinished(e -> {
                 if (playerSprite != null) {
                     setPlayerState("hurt");
                     playFrameAnimation(playerSprite, "player/hurt", 3, 0.08, () -> setPlayerState("idle"));
                 }
             });
-            delay.play();
+            monsterAttackDelay.play();
         }
     }
 
@@ -473,6 +515,7 @@ public class BattleController extends BaseSceneController {
         stopCountdown();
         stopIdleFloatAnimation();
         stopFrameTimelines();
+        cancelBattleEndDelay();
         if (sceneManager == null) {
             return;
         }
@@ -482,6 +525,9 @@ public class BattleController extends BaseSceneController {
     @FXML
     public void flee() {
         stopCountdown();
+        stopIdleFloatAnimation();
+        stopFrameTimelines();
+        cancelBattleEndDelay();
         if (sceneManager == null) {
             return;
         }

@@ -15,14 +15,23 @@ public class SceneFactory {
 
     public Scene create(SceneType type) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(getFxmlPath(type)));
+            java.net.URL fxmlUrl = getClass().getResource(getFxmlPath(type));
+            if (fxmlUrl == null) {
+                throw new IllegalStateException("FXML resource not found: " + getFxmlPath(type));
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
             Object controller = loader.getController();
             if (controller instanceof SceneAware aware) {
                 aware.setSceneManager(sceneManager);
             }
-            return new Scene(root, 1280, 720);
-        } catch (IOException | IllegalArgumentException e) {
+            Scene scene = new Scene(root, 1280, 720);
+            java.net.URL cssUrl = getClass().getResource("/css/style.css");
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
+            return scene;
+        } catch (IOException e) {
             throw new IllegalStateException("Failed to load scene: " + type, e);
         }
     }
