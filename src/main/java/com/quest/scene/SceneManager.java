@@ -26,6 +26,19 @@ public class SceneManager {
         playerDao.save(gameState);
     }
 
+    public boolean hasSave() {
+        return playerDao.hasSave();
+    }
+
+    public boolean loadGame() {
+        GameState loaded = playerDao.load();
+        if (loaded != null) {
+            gameState = loaded;
+            return true;
+        }
+        return false;
+    }
+
     public void newGame() {
         gameState = new GameState();
     }

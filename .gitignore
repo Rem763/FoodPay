@@ -13,3 +13,22 @@ Thumbs.db
 /*.png
 /*.zip
 /Free RPG Sprites/
+ 
+ # Generated presentations
+ *.pptx
+ ppt_*.py
+ gen_*.py
+ simple_ppt.py
+ temp_ppt_gen.py
+ helpers_code.py
+ full_ppt_gen.py
+ defense_ppt.py
+ fix_script.py
+ *.txt
+ 
+ # Codex workspace
+ .codex/
+ .agents/
+ 
+ # Project-specific generated
+ 数字闯关-技术设计/

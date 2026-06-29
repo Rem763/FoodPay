@@ -2,12 +2,15 @@ package com.quest.scene;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class TitleController extends BaseSceneController {
     @FXML
     private Label titleLabel;
+    @FXML
+    private Button continueButton;
     @FXML
     private ImageView backgroundImage;
 
@@ -24,6 +27,14 @@ public class TitleController extends BaseSceneController {
         }
     }
 
+    @Override
+    public void setSceneManager(SceneManager sceneManager) {
+        super.setSceneManager(sceneManager);
+        if (continueButton != null && sceneManager != null) {
+            continueButton.setDisable(!sceneManager.hasSave());
+        }
+    }
+
     @FXML
     private void goToMap() {
         if (sceneManager == null) {
@@ -33,5 +44,13 @@ public class TitleController extends BaseSceneController {
         sceneManager.switchTo(SceneType.MAP);
     }
 
+    @FXML
+    private void continueGame() {
+        if (sceneManager == null) {
+            return;
+        }
+        if (sceneManager.loadGame()) {
+            sceneManager.switchTo(SceneType.MAP);
+        }
+    }
 }
-

@@ -76,6 +76,7 @@ public class ResultController extends BaseSceneController {
         GameState state = sceneManager.getGameState();
         state.setDefeated(false);
         state.setLevel(state.getLevel() + 1);
+        sceneManager.saveGame();
         sceneManager.switchTo(SceneType.BATTLE);
     }
 
@@ -86,6 +87,7 @@ public class ResultController extends BaseSceneController {
         }
         GameState state = sceneManager.getGameState();
         state.resetAfterDefeat();
+        sceneManager.saveGame();
         sceneManager.switchTo(SceneType.BATTLE);
     }
 
@@ -95,6 +97,7 @@ public class ResultController extends BaseSceneController {
             return;
         }
         sceneManager.getGameState().setDefeated(false);
+        sceneManager.saveGame();
         sceneManager.switchTo(SceneType.MAP);
     }
 }

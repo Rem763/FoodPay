@@ -64,7 +64,7 @@ public class QuestionGenerator {
                 }
             }
             case 4 -> {
-                operator = '×';
+                operator = '脳';
                 operandA = random.nextInt(10) + 1;
                 operandB = random.nextInt(10) + 1;
                 answer = operandA * operandB;
@@ -74,14 +74,14 @@ public class QuestionGenerator {
                 operator = switch (op) {
                     case 0 -> '+';
                     case 1 -> '-';
-                    case 2 -> '×';
-                    default -> '÷';
+                    case 2 -> '脳';
+                    default -> '梅';
                 };
-                if (operator == '÷') {
+                if (operator == '梅') {
                     operandB = random.nextInt(9) + 1;
                     answer = random.nextInt(12) + 1;
                     operandA = operandB * answer;
-                } else if (operator == '×') {
+                } else if (operator == '脳') {
                     operandA = random.nextInt(12) + 1;
                     operandB = random.nextInt(12) + 1;
                     answer = operandA * operandB;
